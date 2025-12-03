@@ -93,6 +93,7 @@ body {
     padding: var(--space-lg);
     opacity: 0;
     transition: opacity 0.3s ease;
+    background: linear-gradient(135deg, var(--teal-deep) 0%, var(--teal-mid) 50%, var(--teal-light) 100%);
 }
 
 .screen.active {

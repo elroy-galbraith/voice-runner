@@ -14,8 +14,7 @@ const STATIC_ASSETS = [
     '/js/game.js',
     '/js/app.js',
     '/manifest.json',
-    '/assets/icon-192.png',
-    '/assets/icon-512.png'
+    '/assets/icon-192.svg'
 ];
 
 // External resources to cache

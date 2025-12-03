@@ -13,8 +13,10 @@ const Storage = (function() {
         PENDING: 'pendingUploads'
     };
     
-    // API endpoint - change for production
-    const API_BASE = 'https://your-api.fly.dev/api';
+    // API endpoint - uses localhost for dev, change for production
+    const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:8000/api'
+        : 'https://your-api.fly.dev/api';
     
     let db = null;
     

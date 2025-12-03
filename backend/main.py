@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional, List
 from pathlib import Path
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -222,11 +222,12 @@ async def health_check():
 @app.post("/api/upload", response_model=UploadResponse)
 async def upload_session(
     background_tasks: BackgroundTasks,
+    request: Request,
     session: str = Form(...),
 ):
     """
     Upload a complete game session with recordings.
-    
+
     This endpoint receives:
     - session: JSON string with session metadata
     - audio_N: Audio files (N = 0, 1, 2, ...)
@@ -235,22 +236,55 @@ async def upload_session(
     try:
         session_data = json.loads(session)
         session_id = session_data.get("id", str(uuid.uuid4()))
-        
-        # For now, just save the session data
-        # Audio files would be handled separately in a real implementation
+
+        # Save session data
         session_obj = SessionData(**session_data)
         save_session_local(session_obj)
-        
+
+        # Parse the form data to get audio files
+        form = await request.form()
+        recordings_count = 0
+
+        # Find all audio files (audio_0, audio_1, etc.)
+        idx = 0
+        while f"audio_{idx}" in form:
+            audio_file = form[f"audio_{idx}"]
+            audio_meta_str = form.get(f"audio_{idx}_meta")
+
+            if audio_file and audio_meta_str:
+                # Read audio data
+                audio_data = await audio_file.read()
+
+                # Parse metadata
+                audio_meta = json.loads(audio_meta_str)
+                metadata = RecordingMetadata(**audio_meta)
+
+                # Save audio file
+                filename = f"{metadata.phraseId}.webm"
+                if STORAGE_TYPE == "r2" and s3_client:
+                    audio_path = save_audio_r2(session_id, metadata.phraseId, audio_data, filename)
+                else:
+                    audio_path = save_audio_local(session_id, metadata.phraseId, audio_data, filename)
+
+                # Save recording metadata
+                save_recording_metadata_local(metadata, audio_path)
+                recordings_count += 1
+
+            idx += 1
+
+        print(f"Uploaded session {session_id} with {recordings_count} recordings")
+
         return UploadResponse(
             success=True,
             sessionId=session_id,
-            recordingsReceived=0,  # Will be updated when audio handling is added
-            message="Session uploaded successfully"
+            recordingsReceived=recordings_count,
+            message=f"Session uploaded successfully with {recordings_count} recordings"
         )
-        
+
     except json.JSONDecodeError as e:
         raise HTTPException(status_code=400, detail=f"Invalid JSON: {e}")
     except Exception as e:
+        print(f"Upload error: {e}")
         raise HTTPException(status_code=500, detail=f"Upload failed: {e}")
 
 

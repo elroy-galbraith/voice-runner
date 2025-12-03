@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a5f4a">
+    <meta name="description" content="Voice Runner - A game that helps improve emergency services for Caribbean communities">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <title>Voice Runner</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-content">
+            <div class="logo-pulse">🐦</div>
+            <h1>Voice Runner</h1>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p>Loading game...</p>
+        </div>
+    </div>
+
+    <!-- Landing Screen -->
+    <div id="landing-screen" class="screen">
+        <div class="landing-content">
+            <div class="hero-bird">🐦</div>
+            <h1>Voice Runner</h1>
+            <p class="tagline">Speak to Survive!</p>
+            
+            <div class="mission-box">
+                <p>A game that helps improve emergency services for Caribbean communities</p>
+                <div class="church-badge">
+                    <span>Supported by</span>
+                    <strong>MCCA & UWI Researchers</strong>
+                </div>
+            </div>
+            
+            <button id="start-btn" class="btn-primary">
+                <span>START PLAYING</span>
+                <span class="btn-icon">▶</span>
+            </button>
+            
+            <div class="privacy-note">
+                <span>🔒</span>
+                <span>Your voice helps research. All data is anonymized.</span>
+            </div>
+        </div>
+        
+        <div class="decorative-clouds">
+            <div class="cloud cloud-1">☁️</div>
+            <div class="cloud cloud-2">☁️</div>
+            <div class="cloud cloud-3">☁️</div>
+        </div>
+    </div>
+
+    <!-- Permissions Screen -->
+    <div id="permissions-screen" class="screen">
+        <div class="permissions-content">
+            <div class="mic-icon-large">🎤</div>
+            <h2>We need microphone access</h2>
+            <p>This game is played with your voice! Speak phrases to break obstacles.</p>
+            
+            <div class="info-card">
+                <p>Your recordings help train emergency systems to understand Caribbean voices.</p>
+            </div>
+            
+            <button id="allow-mic-btn" class="btn-primary">
+                <span>ALLOW MICROPHONE</span>
+            </button>
+            
+            <p class="privacy-small">Recordings are anonymous and never shared publicly.</p>
+        </div>
+    </div>
+
+    <!-- Profile Screen -->
+    <div id="profile-screen" class="screen">
+        <div class="profile-content">
+            <h2>Quick Questions</h2>
+            <p class="subtitle">Optional - helps our research</p>
+            
+            <div class="form-group">
+                <label for="age-range">Age range:</label>
+                <select id="age-range">
+                    <option value="">Prefer not to say</option>
+                    <option value="under18">Under 18</option>
+                    <option value="18-24">18-24</option>
+                    <option value="25-34">25-34</option>
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                    <option value="65+">65+</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="parish">Parish / Island:</label>
+                <select id="parish">
+                    <option value="">Prefer not to say</option>
+                    <optgroup label="Jamaica">
+                        <option value="kingston">Kingston</option>
+                        <option value="st-andrew">St. Andrew</option>
+                        <option value="st-thomas">St. Thomas</option>
+                        <option value="portland">Portland</option>
+                        <option value="st-mary">St. Mary</option>
+                        <option value="st-ann">St. Ann</option>
+                        <option value="trelawny">Trelawny</option>
+                        <option value="st-james">St. James</option>
+                        <option value="hanover">Hanover</option>
+                        <option value="westmoreland">Westmoreland</option>
+                        <option value="st-elizabeth">St. Elizabeth</option>
+                        <option value="manchester">Manchester</option>
+                        <option value="clarendon">Clarendon</option>
+                        <option value="st-catherine">St. Catherine</option>
+                    </optgroup>
+                    <optgroup label="Other Caribbean">
+                        <option value="montserrat">Montserrat</option>
+                        <option value="barbados">Barbados</option>
+                        <option value="trinidad">Trinidad & Tobago</option>
+                        <option value="bahamas">Bahamas</option>
+                        <option value="antigua">Antigua & Barbuda</option>
+                        <option value="other">Other</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Do you speak Patois at home?</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="patois" value="yes">
+                        <span>Yes</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="patois" value="sometimes">
+                        <span>Sometimes</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="patois" value="no">
+                        <span>No</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="button-row">
+                <button id="skip-profile-btn" class="btn-secondary">SKIP</button>
+                <button id="save-profile-btn" class="btn-primary">CONTINUE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Screen -->
+    <div id="tutorial-screen" class="screen">
+        <div class="tutorial-content">
+            <h2>How to Play</h2>
+            
+            <div class="tutorial-step">
+                <div class="step-visual">
+                    <span class="cloud-icon">☁️</span>
+                    <span class="arrow">→→→</span>
+                    <span class="bird-icon">🐦</span>
+                </div>
+                <p>Obstacles approach your bird</p>
+            </div>
+            
+            <div class="tutorial-step">
+                <div class="step-visual phrase-example">
+                    "Open the door"
+                </div>
+                <p>A phrase appears below</p>
+            </div>
+            
+            <div class="tutorial-step">
+                <div class="step-visual">
+                    <span class="mic-icon">🎤</span>
+                    <span class="sound-waves">◠◠◠</span>
+                </div>
+                <p>Speak the phrase clearly to destroy the obstacle!</p>
+            </div>
+            
+            <div class="tip-box">
+                <strong>💡 Tip:</strong> The game gets faster and phrases get longer. Stay focused!
+            </div>
+            
+            <button id="start-tutorial-btn" class="btn-primary">
+                <span>PRACTICE ROUND</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Calibration Screen -->
+    <div id="calibration-screen" class="screen">
+        <div class="calibration-content">
+            <h2>Calibration</h2>
+            <p>Let's test your microphone with 3 practice phrases</p>
+            
+            <div class="calibration-progress">
+                <span class="cal-dot active"></span>
+                <span class="cal-dot"></span>
+                <span class="cal-dot"></span>
+            </div>
+            
+            <div class="calibration-phrase-box">
+                <p id="calibration-phrase">Loading...</p>
+            </div>
+            
+            <div class="mic-visualizer">
+                <div class="mic-icon-cal">🎤</div>
+                <div class="volume-bars">
+                    <div class="vol-bar"></div>
+                    <div class="vol-bar"></div>
+                    <div class="vol-bar"></div>
+                    <div class="vol-bar"></div>
+                    <div class="vol-bar"></div>
+                </div>
+            </div>
+            
+            <p id="calibration-status" class="cal-status">Speak now...</p>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div class="game-hud">
+            <div class="hud-left">
+                <span class="score-label">SCORE</span>
+                <span id="score" class="score-value">0</span>
+            </div>
+            <div class="hud-center">
+                <div id="lives" class="lives">
+                    <span class="heart">❤️</span>
+                    <span class="heart">❤️</span>
+                    <span class="heart">❤️</span>
+                </div>
+                <div id="combo" class="combo hidden">
+                    <span class="combo-value">2x</span>
+                    <span class="combo-label">COMBO</span>
+                </div>
+            </div>
+            <div class="hud-right">
+                <span class="level-label">LEVEL</span>
+                <span id="level" class="level-value">1</span>
+            </div>
+        </div>
+        
+        <canvas id="game-canvas"></canvas>
+        
+        <div class="phrase-display">
+            <div id="current-phrase" class="phrase-text">Get ready...</div>
+            <div class="mic-indicator">
+                <span class="mic-icon-small">🎤</span>
+                <div id="listening-bar" class="listening-bar">
+                    <div class="listening-progress"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="feedback-overlay" class="feedback-overlay hidden">
+            <span class="feedback-text"></span>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+        <div class="gameover-content">
+            <h2>Game Over!</h2>
+            
+            <div class="final-score">
+                <span class="fs-label">FINAL SCORE</span>
+                <span id="final-score" class="fs-value">0</span>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-value" id="phrases-spoken">0</span>
+                    <span class="stat-label">Phrases Spoken</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="max-level">1</span>
+                    <span class="stat-label">Max Level</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="accuracy">0%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="best-combo">1x</span>
+                    <span class="stat-label">Best Combo</span>
+                </div>
+            </div>
+            
+            <div class="contribution-note">
+                <p>🎉 You contributed <span id="phrases-contributed">0</span> voice samples!</p>
+                <p class="small">Thank you for helping Caribbean communities.</p>
+            </div>
+            
+            <div class="button-row">
+                <button id="play-again-btn" class="btn-primary">PLAY AGAIN</button>
+                <button id="share-btn" class="btn-secondary">SHARE</button>
+            </div>
+            
+            <div id="upload-status" class="upload-status">
+                <span class="upload-icon">☁️</span>
+                <span class="upload-text">Uploading your contributions...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error/Offline Banner -->
+    <div id="offline-banner" class="offline-banner hidden">
+        <span>📴 You're offline. Data will sync when connected.</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/phrases.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered:', registration.scope);
+                        
+                        // Listen for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    console.log('New version available!');
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed:', error);
+                    });
+                
+                // Listen for messages from service worker
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data.type === 'SYNC_RECORDINGS') {
+                        Storage.syncWithServer();
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

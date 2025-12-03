@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="40" fill="#1a5f4a"/>
+  
+  <!-- Bird body -->
+  <ellipse cx="96" cy="105" rx="35" ry="25" fill="#ffc857"/>
+  
+  <!-- Wing -->
+  <ellipse cx="85" cy="100" rx="20" ry="12" fill="#ff8a7d" transform="rotate(-15 85 100)"/>
+  
+  <!-- Head -->
+  <circle cx="120" cy="85" r="18" fill="#ffc857"/>
+  
+  <!-- Beak -->
+  <path d="M135 85 L160 90 L135 95 Z" fill="#ff6b5b"/>
+  
+  <!-- Eye -->
+  <circle cx="125" cy="82" r="5" fill="#1a1a2e"/>
+  <circle cx="126" cy="81" r="2" fill="white"/>
+  
+  <!-- Tail feathers -->
+  <path d="M65 105 Q40 95 50 115 Q55 108 65 105" fill="#22c55e"/>
+  <path d="M60 110 Q35 105 45 120 Q52 115 60 110" fill="#22c55e"/>
+  
+  <!-- Sound waves -->
+  <path d="M145 75 Q155 75 155 85" stroke="white" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M150 70 Q165 70 165 85" stroke="white" stroke-width="3" fill="none" opacity="0.4"/>
+  <path d="M155 65 Q175 65 175 85" stroke="white" stroke-width="3" fill="none" opacity="0.2"/>
+  
+  <!-- Text -->
+  <text x="96" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">VOICE</text>
+</svg>

@@ -353,8 +353,8 @@ const Game = (function () {
         const canvasWidth = canvas.width / window.devicePixelRatio;
         const canvasHeight = canvas.height / window.devicePixelRatio;
 
-        // Select random lane for cloud
-        const cloudLane = Math.floor(Math.random() * 3); // 0, 1, or 2
+        // Cloud ALWAYS spawns in bird's current lane (forces player to speak)
+        const cloudLane = player.currentLane;
 
         // Select different lane for phrase (not same as cloud)
         const availableLanes = [LANES.TOP, LANES.MIDDLE, LANES.BOTTOM].filter(l => l !== cloudLane);

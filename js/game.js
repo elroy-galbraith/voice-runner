@@ -229,7 +229,18 @@ const Game = (function () {
 
             // Check collision
             if (!obs.destroyed && !player.invincible && checkCollision(obs)) {
+                console.log('Collision detected!', { playerX: player.x, playerY: player.y, obsX: obs.x, obsY: obs.y });
                 handleCollision(obs);
+            }
+
+            // Debug: log when obstacle passes player area without collision
+            if (!obs.destroyed && obs.x < player.x && !obs.passedPlayer) {
+                obs.passedPlayer = true;
+                console.log('Obstacle passed player without collision!', {
+                    playerX: player.x, playerY: player.y, playerW: player.width, playerH: player.height,
+                    obsX: obs.x, obsY: obs.y, obsW: obs.width, obsH: obs.height,
+                    invincible: player.invincible
+                });
             }
 
             // Remove off-screen obstacles

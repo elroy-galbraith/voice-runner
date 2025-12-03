@@ -30,6 +30,22 @@ const Game = (function () {
     let phrasesAttempted = 0;
     let phrasesSucceeded = 0;
 
+    // Lane system
+    const LANES = {
+        TOP: 0,
+        MIDDLE: 1,
+        BOTTOM: 2
+    };
+
+    function getLaneY(lane, canvasHeight) {
+        const positions = [
+            canvasHeight * 0.2,  // Top
+            canvasHeight * 0.5,  // Middle
+            canvasHeight * 0.8   // Bottom
+        ];
+        return positions[lane];
+    }
+
     // Player (bird)
     const player = {
         x: 80,
@@ -37,6 +53,12 @@ const Game = (function () {
         width: 50,
         height: 40,
         baseY: 0,
+        targetY: 0,
+        isMoving: false,
+        moveStartTime: 0,
+        moveStartY: 0,
+        moveDuration: 500, // 0.5 seconds
+        currentLane: LANES.MIDDLE,
         bobOffset: 0,
         bobSpeed: 0.003,
         invincible: false,
@@ -96,9 +118,13 @@ const Game = (function () {
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        // Initialize player position
-        player.baseY = canvas.height * 0.6;
+        // Initialize player position (start in middle lane)
+        const canvasHeight = canvas.height / window.devicePixelRatio;
+        player.currentLane = LANES.MIDDLE;
+        player.baseY = getLaneY(LANES.MIDDLE, canvasHeight);
         player.y = player.baseY;
+        player.targetY = player.baseY;
+        player.isMoving = false;
 
         // Create background clouds
         createBackgroundClouds();
@@ -125,8 +151,9 @@ const Game = (function () {
 
         // Update player position
         if (player) {
-            player.baseY = container.clientHeight * 0.6;
+            player.baseY = getLaneY(player.currentLane, container.clientHeight);
             player.y = player.baseY;
+            player.targetY = player.baseY;
         }
     }
 
@@ -168,6 +195,14 @@ const Game = (function () {
         obstacleSpawnTimer = 0;
         elapsedTime = 0;
         player.invincible = false;
+        player.currentLane = LANES.MIDDLE;
+        player.isMoving = false;
+
+        // Reset player position to middle lane
+        const canvasHeight = canvas.height / window.devicePixelRatio;
+        player.baseY = getLaneY(LANES.MIDDLE, canvasHeight);
+        player.y = player.baseY;
+        player.targetY = player.baseY;
 
         // Reset phrase selection
         Phrases.reset();
@@ -210,6 +245,22 @@ const Game = (function () {
 
         // Update elapsed time
         elapsedTime += deltaTime;
+
+        // Update player position (lerp to target if moving)
+        if (player.isMoving) {
+            const elapsed = performance.now() - player.moveStartTime;
+            const progress = Math.min(elapsed / player.moveDuration, 1);
+
+            // Smooth easing function (ease-out)
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+            player.baseY = player.moveStartY + (player.targetY - player.moveStartY) * easeProgress;
+
+            if (progress >= 1) {
+                player.isMoving = false;
+                player.baseY = player.targetY;
+            }
+        }
 
         // Update player bob animation
         player.bobOffset = Math.sin(elapsedTime * player.bobSpeed) * 8;
@@ -296,26 +347,39 @@ const Game = (function () {
     }
 
     /**
-     * Spawn a new obstacle
+     * Spawn a new obstacle (cloud) with paired phrase
      */
     function spawnObstacle() {
         const canvasWidth = canvas.width / window.devicePixelRatio;
         const canvasHeight = canvas.height / window.devicePixelRatio;
 
+        // Select random lane for cloud
+        const cloudLane = Math.floor(Math.random() * 3); // 0, 1, or 2
+
+        // Select different lane for phrase (not same as cloud)
+        const availableLanes = [LANES.TOP, LANES.MIDDLE, LANES.BOTTOM].filter(l => l !== cloudLane);
+        const phraseLane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+
+        // Get phrase from Phrases module
+        const phraseObj = Phrases.selectPhrase(level);
+
         const obstacle = {
             x: canvasWidth + 100,
-            y: canvasHeight * 0.6 - 30, // Align with player (bird) position
+            y: getLaneY(cloudLane, canvasHeight) - 30, // Center cloud in lane
             width: 80 + level * 5,
             height: 60 + level * 3,
+            lane: cloudLane,
             tier: getTierForLevel(level),
             triggered: false,
             destroyed: false,
-            phrase: null,
+            phrase: phraseObj,
+            phraseLane: phraseLane,
+            phraseY: getLaneY(phraseLane, canvasHeight),
             destroyAnimation: 0
         };
 
         obstacles.push(obstacle);
-        console.log('Spawned obstacle at x:', obstacle.x, 'canvasWidth:', canvasWidth, 'player at:', player.x, player.y);
+        console.log('Spawned obstacle at lane:', cloudLane, 'phrase at lane:', phraseLane);
     }
 
     /**
@@ -330,8 +394,7 @@ const Game = (function () {
      * Trigger phrase display when obstacle approaches
      */
     function triggerPhrase(obstacle) {
-        currentPhrase = Phrases.selectPhrase(level);
-        obstacle.phrase = currentPhrase;
+        currentPhrase = obstacle.phrase;
         phraseStartTime = performance.now();
         speechDetected = false;
         phrasesAttempted++;
@@ -397,7 +460,16 @@ const Game = (function () {
     function phraseSuccess(evaluation) {
         if (!currentObstacle || currentObstacle.destroyed) return;
 
-        // Destroy obstacle
+        const canvasHeight = canvas.height / window.devicePixelRatio;
+
+        // Move bird to phrase lane
+        player.currentLane = currentObstacle.phraseLane;
+        player.targetY = getLaneY(currentObstacle.phraseLane, canvasHeight);
+        player.moveStartY = player.baseY;
+        player.moveStartTime = performance.now();
+        player.isMoving = true;
+
+        // Mark obstacle as destroyed (will pass harmlessly)
         currentObstacle.destroyed = true;
         currentObstacle.destroyAnimation = 1;
 
@@ -491,9 +563,12 @@ const Game = (function () {
         ctx.fillStyle = '#d4c4b0';
         ctx.fillRect(0, height * 0.85, width, height * 0.15);
 
-        // Draw obstacles
+        // Draw obstacles and phrases
         for (const obs of obstacles) {
             drawObstacle(obs);
+            if (!obs.destroyed && obs.phrase) {
+                drawPhrase(obs);
+            }
         }
 
         // Draw player
@@ -565,6 +640,53 @@ const Game = (function () {
         }
 
         ctx.globalAlpha = 1;
+    }
+
+    /**
+     * Draw phrase text at phrase position
+     */
+    function drawPhrase(obs) {
+        const phraseX = obs.x;
+        const phraseY = obs.phraseY;
+
+        // Set font first for accurate measurement
+        ctx.font = 'bold 18px Fredoka';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Draw phrase background (light bubble)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.strokeStyle = 'rgba(100, 200, 100, 0.8)';
+        ctx.lineWidth = 3;
+
+        const padding = 15;
+        const textMetrics = ctx.measureText(obs.phrase.text);
+        const textWidth = textMetrics.width;
+        const bubbleWidth = textWidth + padding * 2;
+        const bubbleHeight = 40;
+
+        // Draw rounded rectangle bubble
+        const bubbleX = phraseX - bubbleWidth / 2;
+        const bubbleY = phraseY - bubbleHeight / 2;
+        const radius = 10;
+
+        ctx.beginPath();
+        ctx.moveTo(bubbleX + radius, bubbleY);
+        ctx.lineTo(bubbleX + bubbleWidth - radius, bubbleY);
+        ctx.quadraticCurveTo(bubbleX + bubbleWidth, bubbleY, bubbleX + bubbleWidth, bubbleY + radius);
+        ctx.lineTo(bubbleX + bubbleWidth, bubbleY + bubbleHeight - radius);
+        ctx.quadraticCurveTo(bubbleX + bubbleWidth, bubbleY + bubbleHeight, bubbleX + bubbleWidth - radius, bubbleY + bubbleHeight);
+        ctx.lineTo(bubbleX + radius, bubbleY + bubbleHeight);
+        ctx.quadraticCurveTo(bubbleX, bubbleY + bubbleHeight, bubbleX, bubbleY + bubbleHeight - radius);
+        ctx.lineTo(bubbleX, bubbleY + radius);
+        ctx.quadraticCurveTo(bubbleX, bubbleY, bubbleX + radius, bubbleY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw phrase text
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillText(obs.phrase.text, phraseX, phraseY);
     }
 
     /**

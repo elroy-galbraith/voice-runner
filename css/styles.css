@@ -310,6 +310,21 @@ body {
     gap: var(--space-md);
     justify-content: center;
     flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Center standalone buttons */
+.screen .btn-primary,
+.screen .btn-secondary {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* But not when inside button-row */
+.button-row .btn-primary,
+.button-row .btn-secondary {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 /* ========== PERMISSIONS SCREEN ========== */
@@ -366,6 +381,7 @@ body {
 .profile-content {
     max-width: 350px;
     width: 100%;
+    text-align: center;
 }
 
 .profile-content h2 {
@@ -390,6 +406,7 @@ body {
     font-size: 0.95rem;
     font-weight: 600;
     margin-bottom: var(--space-sm);
+    text-align: left;
 }
 
 .form-group select {

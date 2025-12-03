@@ -30,6 +30,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:8000",
+        "http://localhost:8080",  # Python http.server default
         "https://voice-runner.pages.dev",  # Production frontend
         "https://*.voice-runner.pages.dev",  # Preview deployments
     ],

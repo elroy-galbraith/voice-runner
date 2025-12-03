@@ -293,7 +293,7 @@ const Game = (function () {
 
         const obstacle = {
             x: canvasWidth + 100,
-            y: canvasHeight * 0.4,
+            y: canvasHeight * 0.6 - 30, // Align with player (bird) position
             width: 80 + level * 5,
             height: 60 + level * 3,
             tier: getTierForLevel(level),

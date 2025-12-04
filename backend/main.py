@@ -31,7 +31,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:8000",
         "http://localhost:8080",  # Python http.server default
-        "https://voice-runner.vercel.app/",  # Production frontend
+        "https://voice-runner.vercel.app",  # Production frontend
         "https://*.voice-runner.pages.dev",  # Preview deployments
     ],
     allow_credentials=True,

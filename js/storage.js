@@ -16,7 +16,7 @@ const Storage = (function() {
     // API endpoint - uses localhost for dev, change for production
     const API_BASE = window.location.hostname === 'localhost'
         ? 'http://localhost:8000/api'
-        : 'voice-runner-production.up.railway.app/api';
+        : 'https://voice-runner-production.up.railway.app/api';
     
     let db = null;
     

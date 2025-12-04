@@ -23,7 +23,7 @@
 2. New Project → Import voice-runner
 3. Root: ./ → Build: (empty) → Output: ./
 4. Deploy!
-5. Copy your Vercel URL: https://xxx.vercel.app
+5. Copy your Vercel URL: https://voice-runner.vercel.app/
 ```
 
 #### Step 3: Connect Them (5 min)

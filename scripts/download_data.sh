@@ -54,7 +54,7 @@ cat export.json | jq -r '.recordings[] | @json' | while read -r recording; do
     mkdir -p "recordings/metadata/${SESSION_ID}"
 
     # Save metadata
-    FILENAME="${PHRASE_ID}_${TIMESTAMP//:/-.json"
+    FILENAME="${PHRASE_ID}_${TIMESTAMP//:/-}.json"
     echo "$recording" | jq '.' > "recordings/metadata/${SESSION_ID}/${FILENAME}"
 done
 echo "✓ Recording metadata saved to: recordings/metadata/"

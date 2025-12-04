@@ -27,8 +27,9 @@ In Railway dashboard → Variables, add:
 ```bash
 STORAGE_TYPE=local
 LOCAL_STORAGE_PATH=/app/data
-PORT=8000
 ```
+
+**Note:** Railway automatically sets the `PORT` environment variable - you don't need to configure it manually.
 
 **Optional (for Cloudflare R2 storage):**
 ```bash

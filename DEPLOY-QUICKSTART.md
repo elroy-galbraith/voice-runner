@@ -11,8 +11,10 @@
 3. Add Variables:
    - STORAGE_TYPE = local
    - LOCAL_STORAGE_PATH = /app/data
+   (Railway auto-sets PORT - don't add it manually)
 4. Add Volume: /app/data (1GB)
-5. Copy your Railway URL: https://xxx.up.railway.app
+5. Settings → Networking → Generate Domain
+6. Copy your Railway URL: voice-runner-production.up.railway.app
 ```
 
 #### Step 2: Frontend → Vercel (2 min)
@@ -27,7 +29,7 @@
 #### Step 3: Connect Them (5 min)
 ```bash
 # Update frontend to use Railway backend
-export RAILWAY_BACKEND_URL=https://xxx.up.railway.app
+export RAILWAY_BACKEND_URL=voice-runner-production.up.railway.app
 ./deploy.sh
 
 # Update backend to allow Vercel frontend

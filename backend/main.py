@@ -12,10 +12,12 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
 from pydantic import BaseModel
 import boto3
 from botocore.config import Config
+import tarfile
+import io
 
 # Initialize FastAPI
 app = FastAPI(
@@ -384,19 +386,19 @@ async def export_data(format: str = "json"):
     try:
         sessions_dir = LOCAL_STORAGE_PATH / "sessions"
         metadata_dir = LOCAL_STORAGE_PATH / "metadata"
-        
+
         export_data = {
             "exportedAt": datetime.utcnow().isoformat(),
             "sessions": [],
             "recordings": []
         }
-        
+
         # Export sessions
         if sessions_dir.exists():
             for session_file in sessions_dir.glob("*.json"):
                 with open(session_file) as f:
                     export_data["sessions"].append(json.load(f))
-        
+
         # Export recording metadata
         if metadata_dir.exists():
             for session_dir in metadata_dir.iterdir():
@@ -404,11 +406,66 @@ async def export_data(format: str = "json"):
                     for meta_file in session_dir.glob("*.json"):
                         with open(meta_file) as f:
                             export_data["recordings"].append(json.load(f))
-        
+
         return JSONResponse(content=export_data)
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Export failed: {e}")
+
+
+@app.get("/api/download/audio/{session_id}/{phrase_id}")
+async def download_audio(session_id: str, phrase_id: str):
+    """Download a specific audio recording"""
+    try:
+        audio_dir = LOCAL_STORAGE_PATH / "audio" / session_id
+
+        # Find the audio file
+        audio_files = list(audio_dir.glob(f"{phrase_id}*.webm"))
+
+        if not audio_files:
+            raise HTTPException(status_code=404, detail="Audio file not found")
+
+        audio_file = audio_files[0]
+
+        return FileResponse(
+            path=audio_file,
+            media_type="audio/webm",
+            filename=audio_file.name
+        )
+
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Download failed: {e}")
+
+
+@app.get("/api/download/archive")
+async def download_archive():
+    """Download complete data archive as tar.gz"""
+    try:
+        # Create tar.gz in memory
+        tar_buffer = io.BytesIO()
+
+        with tarfile.open(fileobj=tar_buffer, mode='w:gz') as tar:
+            # Add all data directories
+            if LOCAL_STORAGE_PATH.exists():
+                tar.add(LOCAL_STORAGE_PATH, arcname='voice-runner-data')
+
+        tar_buffer.seek(0)
+
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        filename = f"voice-runner-data_{timestamp}.tar.gz"
+
+        return StreamingResponse(
+            tar_buffer,
+            media_type="application/gzip",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Archive creation failed: {e}")
 
 
 # Run with: uvicorn main:app --reload --host 0.0.0.0 --port 8000

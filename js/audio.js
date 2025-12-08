@@ -208,8 +208,8 @@ const Audio = (function() {
             // Calculate RMS volume
             let sum = 0;
             let max = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                const normalized = (dataArray[i] - 128) / 128;
+            for (const value of dataArray) {
+                const normalized = (value - 128) / 128;
                 sum += normalized * normalized;
                 max = Math.max(max, Math.abs(normalized));
             }
@@ -295,13 +295,13 @@ const Audio = (function() {
         if (!analyser || !dataArray) return 0;
         
         analyser.getByteTimeDomainData(dataArray);
-        
+
         let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-            const normalized = (dataArray[i] - 128) / 128;
+        for (const value of dataArray) {
+            const normalized = (value - 128) / 128;
             sum += normalized * normalized;
         }
-        
+
         return Math.sqrt(sum / dataArray.length);
     }
     

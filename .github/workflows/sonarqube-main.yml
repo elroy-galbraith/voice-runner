@@ -1,17 +1,17 @@
 name: SonarQube Main Branch Analysis
 
+# Temporarily disabled - enable after deploying SonarQube publicly
+# To enable: uncomment push trigger and add SONAR_TOKEN + SONAR_HOST_URL secrets
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   sonarqube-main-analysis:
     name: Full SonarQube Analysis
     runs-on: ubuntu-latest
-    # Only run if secrets are configured
-    if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
 
     steps:
       - name: Checkout code

@@ -1,0 +1,58 @@
+# Bandit security scanner configuration
+# Focuses on high-severity issues to keep pre-commit fast
+
+# Exclude test files and migrations
+exclude_dirs:
+  - /tests/
+  - /test/
+  - /__pycache__/
+  - /venv/
+  - /.venv/
+
+# Only show medium and high severity issues
+skips:
+  - B101  # assert_used - common in tests
+  - B601  # paramiko_calls - not applicable
+
+# Test for common security issues
+tests:
+  - B201  # flask_debug_true
+  - B301  # pickle usage
+  - B302  # marshal usage
+  - B303  # md5 usage
+  - B304  # insecure ciphers
+  - B305  # insecure cipher modes
+  - B306  # insecure mktemp usage
+  - B307  # eval usage
+  - B308  # mark_safe usage
+  - B309  # httpsconnection usage
+  - B310  # urllib_urlopen
+  - B311  # random usage
+  - B312  # telnetlib usage
+  - B313  # xml_bad_cElementTree
+  - B314  # xml_bad_ElementTree
+  - B315  # xml_bad_expatreader
+  - B316  # xml_bad_expatbuilder
+  - B317  # xml_bad_sax
+  - B318  # xml_bad_minidom
+  - B319  # xml_bad_pulldom
+  - B320  # xml_bad_etree
+  - B321  # ftplib
+  - B323  # unverified_context
+  - B324  # hashlib
+  - B501  # request_with_no_cert_validation
+  - B502  # ssl_with_bad_version
+  - B503  # ssl_with_bad_defaults
+  - B504  # ssl_with_no_version
+  - B505  # weak_cryptographic_key
+  - B506  # yaml_load
+  - B507  # ssh_no_host_key_verification
+  - B601  # paramiko_calls
+  - B602  # shell_injection_subprocess_popen
+  - B603  # subprocess_without_shell_equals_true
+  - B604  # any_other_function_with_shell_equals_true
+  - B605  # start_process_with_a_shell
+  - B606  # start_process_with_no_shell
+  - B607  # start_process_with_partial_path
+  - B608  # hardcoded_sql_expressions
+  - B609  # linux_commands_wildcard_injection

@@ -1,0 +1,68 @@
+{
+  "name": "New Code Standards",
+  "description": "Quality gate for Voice Runner - enforces standards on new code only",
+  "conditions": [
+    {
+      "metric": "new_security_hotspots_reviewed",
+      "op": "LT",
+      "error": "100",
+      "description": "Security Hotspots Reviewed on New Code must be 100%"
+    },
+    {
+      "metric": "new_security_rating",
+      "op": "GT",
+      "error": "1",
+      "description": "Security Rating on New Code must be A (1)"
+    },
+    {
+      "metric": "new_reliability_rating",
+      "op": "GT",
+      "error": "1",
+      "description": "Reliability Rating on New Code must be A (1)"
+    },
+    {
+      "metric": "new_maintainability_rating",
+      "op": "GT",
+      "error": "1",
+      "description": "Maintainability Rating on New Code must be A (1)"
+    },
+    {
+      "metric": "new_coverage",
+      "op": "LT",
+      "error": "50",
+      "description": "Coverage on New Code must be at least 50%"
+    },
+    {
+      "metric": "new_duplicated_lines_density",
+      "op": "GT",
+      "error": "3",
+      "description": "Duplicated Lines (%) on New Code must not exceed 3%"
+    },
+    {
+      "metric": "new_code_smells",
+      "op": "GT",
+      "error": "5",
+      "description": "Code Smells on New Code must not exceed 5"
+    }
+  ],
+  "notes": [
+    "All conditions apply to NEW CODE only - code changed in the current PR",
+    "Existing code issues will not block PRs",
+    "You can adjust thresholds in SonarQube UI > Quality Gates",
+    "Start lenient and tighten over time as team adapts",
+    "Coverage threshold may need adjustment if no tests exist yet"
+  ],
+  "recommended_adjustments": {
+    "if_no_tests_yet": {
+      "new_coverage": "disabled or set to 0 temporarily"
+    },
+    "if_strict_security_required": {
+      "new_vulnerabilities": 0,
+      "new_security_hotspots_reviewed": "100"
+    },
+    "if_legacy_codebase": {
+      "new_maintainability_rating": "B (2)",
+      "new_code_smells": 10
+    }
+  }
+}

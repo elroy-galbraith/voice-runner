@@ -1,0 +1,59 @@
+name: SonarQube Main Branch Analysis
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  sonarqube-main-analysis:
+    name: Full SonarQube Analysis
+    runs-on: ubuntu-latest
+    # Only run if secrets are configured
+    if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for trend analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pylint bandit
+
+      - name: Run Python linting
+        continue-on-error: true
+        run: |
+          cd backend
+          pylint main.py --output-format=json > ../pylint-report.json || true
+
+      - name: Run Python security scan (Bandit)
+        continue-on-error: true
+        run: |
+          cd backend
+          bandit -r . -f json -o ../bandit-report.json || true
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: SonarQube Quality Gate Check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        # Don't fail main branch builds on quality gate
+        # This allows you to see overall health without blocking
+        continue-on-error: true

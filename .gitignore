@@ -51,3 +51,10 @@ htmlcov/
 tmp/
 temp/
 *.tmp
+
+# SonarQube
+.scannerwork/
+sonar-report.json
+pylint-report.json
+bandit-report.json
+coverage.xml

@@ -6,7 +6,7 @@ FastAPI server for receiving voice recordings and session data
 import os
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 from pathlib import Path
 
@@ -217,7 +217,7 @@ async def health_check():
     return {
         "status": "healthy",
         "storage": STORAGE_TYPE,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
 
@@ -307,7 +307,7 @@ async def upload_audio(
             raise HTTPException(status_code=400, detail="Audio file too large (max 5MB)")
         
         # Generate filename
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         filename = f"{phrase_id}_{timestamp}.webm"
         
         # Save audio
@@ -388,7 +388,7 @@ async def export_data(format: str = "json"):
         metadata_dir = LOCAL_STORAGE_PATH / "metadata"
 
         export_data = {
-            "exportedAt": datetime.utcnow().isoformat(),
+            "exportedAt": datetime.now(timezone.utc).isoformat(),
             "sessions": [],
             "recordings": []
         }
@@ -453,7 +453,7 @@ async def download_archive():
 
         tar_buffer.seek(0)
 
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         filename = f"voice-runner-data_{timestamp}.tar.gz"
 
         return StreamingResponse(

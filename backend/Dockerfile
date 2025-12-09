@@ -19,4 +19,4 @@ EXPOSE 8000
 
 # Run the application
 # Railway provides $PORT env variable - use it if available, otherwise default to 8000
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
